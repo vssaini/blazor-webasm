@@ -1,28 +1,33 @@
 ﻿using BlazorProducts.Client.HttpRepository;
 using Entities.Models;
+using Entities.RequestFeatures;
 using Microsoft.AspNetCore.Components;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace BlazorProducts.Client.Pages
 {
-	public partial class Products
-	{
-		public List<Product> ProductList { get; set; } = new List<Product>();
+    public partial class Products
+    {
+        public List<Product> ProductList { get; set; } = new List<Product>();
+        public MetaData MetaData { get; set; } = new MetaData();
 
-		[Inject]
-		public IProductHttpRepository ProductRepo { get; set; }
+        private ProductParameters _productParameters = new ProductParameters();
 
-		protected async override Task OnInitializedAsync()
-		{
-			ProductList = await ProductRepo.GetProducts();
+        [Inject]
+        public IProductHttpRepository ProductRepo { get; set; }
 
-			//foreach (var product in ProductList)
-			//{
-			//	Console.WriteLine(product.Name);
-			//}
-		}
-	}
+        protected async override Task OnInitializedAsync()
+        {
+            var pagingResponse = await ProductRepo.GetProducts(_productParameters);
+
+            ProductList = pagingResponse.Items;
+            MetaData = pagingResponse.MetaData;
+
+            //foreach (var product in ProductList)
+            //{
+            //	Console.WriteLine(product.Name);
+            //}
+        }
+    }
 }

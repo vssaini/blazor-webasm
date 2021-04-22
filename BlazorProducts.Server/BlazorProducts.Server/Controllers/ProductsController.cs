@@ -1,7 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using BlazorProducts.Server.Repository;
+﻿using BlazorProducts.Server.Repository;
+using Entities.RequestFeatures;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using System;
+using System.Threading.Tasks;
 
 namespace BlazorProducts.Server.Controllers
 {
@@ -16,10 +18,13 @@ namespace BlazorProducts.Server.Controllers
             _repo = repo;
         }
 
-		[HttpGet]
-        public async Task<IActionResult> Get()
+        [HttpGet]
+        public async Task<IActionResult> Get([FromQuery] ProductParameters productParameters)
         {
-            var products = await _repo.GetProducts();
+            var products = await _repo.GetProducts(productParameters);
+
+            Response.Headers.Add("X-Pagination",JsonConvert.SerializeObject(products.MetaData));
+
             return Ok(products);
         }
 
